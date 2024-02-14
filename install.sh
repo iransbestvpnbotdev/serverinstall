@@ -163,12 +163,12 @@ elif [[ -z "$resolveip" && ! -z "$resolvedns" ]]; then
 fi
 
 # Make Folder /opt/remotend/
-if [ ! -d "/opt/remotend" ]; then
+if [ ! -d "/opt/rustdesk" ]; then
     echo "Creating /opt/remotend"
-    sudo mkdir -p /opt/remotend/
+    sudo mkdir -p /opt/rustdesk/
 fi
-sudo chown "${uname}" -R /opt/remotend
-cd /opt/remotend/ || exit 1
+sudo chown "${uname}" -R /opt/rustdesk
+cd /opt/rustdesk/ || exit 1
 
 
 #Download latest version of remotend
@@ -176,88 +176,87 @@ RDLATEST=$(curl https://api.github.com/repos/iransbestvpnbotdev/remotend-server/
 
 echo "Installing remotend Server"
 if [ "${ARCH}" = "x86_64" ] ; then
-#wget "https://github.com/iransbestvpnbotdev/remotend-server/releases/download/${RDLATEST}/rustdesk-server-linux-amd64.zip"
 wget "https://github.com/iransbestvpnbotdev/remotend-server/releases/download/untagged-e23e03c06c2cc3b85de2/rustdesk-server-linux-amd64.zip"
 unzip rustdesk-server-linux-amd64.zip
-mv amd64/* /opt/remotend/
+mv amd64/* /opt/rustdesk/
 elif [ "${ARCH}" = "armv7l" ] ; then
 wget "https://github.com/iransbestvpnbotdev/remotend-server/releases/download/untagged-e23e03c06c2cc3b85de2/rustdesk-server-linux-armv7.zip"
 unzip rustdesk-server-linux-armv7.zip
-mv armv7/* /opt/remotend/
+mv armv7/* /opt/rustdesk/
 elif [ "${ARCH}" = "aarch64" ] ; then
 wget "https://github.com/iransbestvpnbotdev/remotend-server/releases/download/untagged-e23e03c06c2cc3b85de2/rustdesk-server-linux-arm64v8.zip"
 unzip rustdesk-server-linux-arm64v8.zip
-mv arm64v8/* /opt/remotend/
+mv arm64v8/* /opt/rustdesk/
 fi
 
-chmod +x /opt/remotend/hbbs
-chmod +x /opt/remotend/hbbr
+chmod +x /opt/rustdesk/hbbs
+chmod +x /opt/rustdesk/hbbr
 
 
 # Make Folder /var/log/remotend/
-if [ ! -d "/var/log/remotend" ]; then
+if [ ! -d "/var/log/rustdesk" ]; then
     echo "Creating /var/log/remotend"
-    sudo mkdir -p /var/log/remotend/
+    sudo mkdir -p /var/log/rustdesk/
 fi
-sudo chown "${uname}" -R /var/log/remotend/
+sudo chown "${uname}" -R /var/log/rustdesk/
 
 # Setup Systemd to launch hbbs
-remotendsignal="$(cat << EOF
+rustdesksignal="$(cat << EOF
 [Unit]
-Description=remotend Signal Server
+Description=Rustdesk Signal Server
 [Service]
 Type=simple
 LimitNOFILE=1000000
-ExecStart=/opt/remotend/hbbs -k _
-WorkingDirectory=/opt/remotend/
+ExecStart=/opt/rustdesk/hbbs -k _
+WorkingDirectory=/opt/rustdesk/
 User=${uname}
 Group=${uname}
 Restart=always
-StandardOutput=append:/var/log/remotend/signalserver.log
-StandardError=append:/var/log/remotend/signalserver.error
+StandardOutput=append:/var/log/rustdesk/signalserver.log
+StandardError=append:/var/log/rustdesk/signalserver.error
 # Restart service after 10 seconds if node service crashes
 RestartSec=10
 [Install]
 WantedBy=multi-user.target
 EOF
 )"
-echo "${remotendsignal}" | sudo tee /etc/systemd/system/remotendsignal.service > /dev/null
+echo "${rustdesksignal}" | sudo tee /etc/systemd/system/rustdesksignal.service > /dev/null
 sudo systemctl daemon-reload
-sudo systemctl enable remotendsignal.service
-sudo systemctl start remotendsignal.service
+sudo systemctl enable rustdesksignal.service
+sudo systemctl start rustdesksignal.service
 
 # Setup Systemd to launch hbbr
-remotendrelay="$(cat << EOF
+rustdeskrelay="$(cat << EOF
 [Unit]
-Description=remotend Relay Server
+Description=Rustdesk Relay Server
 [Service]
 Type=simple
 LimitNOFILE=1000000
-ExecStart=/opt/remotend/hbbr -k _
-WorkingDirectory=/opt/remotend/
+ExecStart=/opt/rustdesk/hbbr -k _
+WorkingDirectory=/opt/rustdesk/
 User=${uname}
 Group=${uname}
 Restart=always
-StandardOutput=append:/var/log/remotend/relayserver.log
-StandardError=append:/var/log/remotend/relayserver.error
+StandardOutput=append:/var/log/rustdesk/relayserver.log
+StandardError=append:/var/log/rustdesk/relayserver.error
 # Restart service after 10 seconds if node service crashes
 RestartSec=10
 [Install]
 WantedBy=multi-user.target
 EOF
 )"
-echo "${remotendrelay}" | sudo tee /etc/systemd/system/remotendrelay.service > /dev/null
+echo "${rustdeskrelay}" | sudo tee /etc/systemd/system/rustdeskrelay.service > /dev/null
 sudo systemctl daemon-reload
-sudo systemctl enable remotendrelay.service
-sudo systemctl start remotendrelay.service
+sudo systemctl enable rustdeskrelay.service
+sudo systemctl start rustdeskrelay.service
 
-while ! [[ $CHECK_remotend_READY ]]; do
-  CHECK_remotend_READY=$(sudo systemctl status remotendrelay.service | grep "Active: active (running)")
+while ! [[ $CHECK_RUSTDESK_READY ]]; do
+  CHECK_RUSTDESK_READY=$(sudo systemctl status rustdeskrelay.service | grep "Active: active (running)")
   echo -ne "remotend Relay not ready yet...${NC}\n"
   sleep 3
 done
 
-pubname=$(find /opt/remotend -name "*.pub")
+pubname=$(find /opt/rustdesk -name "*.pub")
 key=$(cat "${pubname}")
 
 echo "Tidying up install"
@@ -309,8 +308,8 @@ function setuphttp () {
     fi
 
     # Copy remotend install scripts to folder
-    mv /opt/remotend/WindowsAgentAIOInstall.ps1 /opt/gohttp/public/
-    mv /opt/remotend/linuxclientinstall.sh /opt/gohttp/public/
+    mv /opt/rustdesk/WindowsAgentAIOInstall.ps1 /opt/gohttp/public/
+    mv /opt/rustdesk/linuxclientinstall.sh /opt/gohttp/public/
 
     # Make gohttp log folders
     if [ ! -d "/var/log/gohttp" ]; then
