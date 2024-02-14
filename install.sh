@@ -176,15 +176,16 @@ RDLATEST=$(curl https://api.github.com/repos/iransbestvpnbotdev/remotend-server/
 
 echo "Installing remotend Server"
 if [ "${ARCH}" = "x86_64" ] ; then
-wget "https://github.com/iransbestvpnbotdev/remotend-server/releases/download/${RDLATEST}/rustdesk-server-linux-amd64.zip"
+#wget "https://github.com/iransbestvpnbotdev/remotend-server/releases/download/${RDLATEST}/rustdesk-server-linux-amd64.zip"
+wget "https://github.com/iransbestvpnbotdev/remotend-server/releases/download/untagged-e23e03c06c2cc3b85de2/rustdesk-server-linux-amd64.zip"
 unzip rustdesk-server-linux-amd64.zip
 mv amd64/* /opt/remotend/
 elif [ "${ARCH}" = "armv7l" ] ; then
-wget "https://github.com/iransbestvpnbotdev/remotend-server/releases/download/${RDLATEST}/rustdesk-server-linux-armv7.zip"
+wget "https://github.com/iransbestvpnbotdev/remotend-server/releases/download/untagged-e23e03c06c2cc3b85de2/rustdesk-server-linux-armv7.zip"
 unzip rustdesk-server-linux-armv7.zip
 mv armv7/* /opt/remotend/
 elif [ "${ARCH}" = "aarch64" ] ; then
-wget "https://github.com/iransbestvpnbotdev/remotend-server/releases/download/${RDLATEST}/rustdesk-server-linux-arm64v8.zip"
+wget "https://github.com/iransbestvpnbotdev/remotend-server/releases/download/untagged-e23e03c06c2cc3b85de2/rustdesk-server-linux-arm64v8.zip"
 unzip rustdesk-server-linux-arm64v8.zip
 mv arm64v8/* /opt/remotend/
 fi
