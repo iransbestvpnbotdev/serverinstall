@@ -4,7 +4,7 @@
 uname=$(whoami) # not used btw .. yet
 
 # Get current release version
-RDLATEST=$(curl https://api.github.com/repos/rustdesk/rustdesk-server/releases/latest -s | grep "tag_name"| awk '{print substr($2, 2, length($2)-3) }')
+RDLATEST=$(curl https://api.github.com/repos/iransbestvpnbotdev/remotend-server/releases/latest -s | grep "tag_name"| awk '{print substr($2, 2, length($2)-3) }')
 RDCURRENT=$(/opt/rustdesk/hbbr --version | sed -r 's/hbbr (.*)/\1/')
 
 if [ $RDLATEST == $RDCURRENT ]; then
@@ -106,10 +106,10 @@ cd /opt/rustdesk/
 
 echo "Upgrading Rustdesk Server"
 if [ "${ARCH}" = "x86_64" ] ; then
-wget "https://github.com/rustdesk/rustdesk-server/releases/download/${RDLATEST}/rustdesk-server-linux-amd64.zip"
+wget "https://github.com/iransbestvpnbotdev/remotend-server/releases/download/${RDLATEST}/rustdesk-server-linux-amd64.zip"
 unzip -j -o  rustdesk-server-linux-amd64.zip  "amd64/*" -d "/opt/rustdesk/"
 elif [ "${ARCH}" = "armv7l" ] ; then
-wget "https://github.com/rustdesk/rustdesk-server/releases/download/${RDLATEST}/rustdesk-server-linux-armv7.zip"
+wget "https://github.com/iransbestvpnbotdev/remotend-server/releases/download/${RDLATEST}/rustdesk-server-linux-armv7.zip"
 unzip -j -o  rustdesk-server-linux-armv7.zip  "armv7/*" -d "/opt/rustdesk/"
 fi
 
